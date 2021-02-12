@@ -16,12 +16,12 @@ Produce offline event information. You can either use the standard CMS HiForest 
    5) cmsRun PbPbSkimAndTree2018_EvtInfoOnly_cfg.py
 
 Combine L1Ntuple and offline event information to perform barrel calorimeter and HF related study
-  For barrel calorimeter related study:
+  For barrel calorimeter related study
     1) cd /yourPath/cmsL1Macro/anaCalo
     2) root -l -b -q makeCaloTree.C+ to do some local test (this macro generates a plain root tree containing calorimeter L1 information and offline event information)
     3) ./submitJob.sh to submit condor job
 
-  For HF related study:
+  For HF related study
     1) cd /yourPath/cmsL1Macro/HFNoiseStudy
     2) check details in anaNoise.C (this macro generates needed histograms by combining L1 infomation and offline event infomation. The reason of not generating a plain root tree, is just because the size of HF L1 information is huge)
 
