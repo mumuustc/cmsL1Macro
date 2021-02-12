@@ -1,0 +1,4 @@
+*/*.root
+anaCalo/*_C*
+anaCalo/condor_projects
+CMSSW_10_3_3_patch1
