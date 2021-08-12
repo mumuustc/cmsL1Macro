@@ -53,10 +53,10 @@ public:
   std::vector<int> iphi_;
   std::vector<int> subdet_;
 
-  std::vector<double> charge_;
-  std::vector<double> charge_ped_;
-  std::vector<double> energy_;
-  std::vector<double> energy_ped_;
+  std::vector<float> charge_;
+  std::vector<float> charge_ped_;
+  std::vector<float> energy_;
+  std::vector<float> energy_ped_;
 
   std::vector<int> ampl_;
 
@@ -178,10 +178,10 @@ void HFAdcToGeV::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
           int soi = tool.presamples();
           // int lastbin = tool.size() - 1;
-          double charge = 0.;
-          double charge_ped = 0;
-          double energy = 0;
-          double energy_ped = 0;
+          float charge = 0.;
+          float charge_ped = 0;
+          float energy = 0;
+          float energy_ped = 0;
           int ampl = 0;
           for (int ii = 0; ii < tool.size(); ii++) 
             {
@@ -225,8 +225,8 @@ HFAdcToGeV::beginJob()
   root->Branch("iphi", &iphi_);
   root->Branch("depth", &depth_);
 
-  root->Branch("charge", &charge_);
-  root->Branch("charge_ped", &charge_ped_);
+  //root->Branch("charge", &charge_);
+  //root->Branch("charge_ped", &charge_ped_);
   root->Branch("energy", &energy_);
   root->Branch("energy_ped", &energy_ped_);
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ntupleType="test"
-#ntupleType="L1NtupleRAWEMUCalo"
+#ntupleType="L1NtupleRAWEMUCalo_HFAdc"
 
 initDir="$PWD/condor_projects/$ntupleType"
 mkdir -p $initDir
@@ -15,9 +15,9 @@ condorJobCfg="$initDir/condorJob_${ntupleType}.con"
 
 cat > $condorJobCfg <<- _EOF_
 Universe     = vanilla
-GetEnv       = True
+GetEnv       = False
 InitialDir   = $initDir
-+JobFlavour  = "testmatch"
++JobFlavour  = "microcentury"
 Requirements = (OpSysAndVer =?= "CentOS7")
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
@@ -30,6 +30,8 @@ _EOF_
 #+JobFlavour  = "workday"       # 8 hours
 #+JobFlavour  = "tomorrow"      # 1 day
 #+JobFlavour  = "testmatch"     # 3 days
+
+nEvts=200;
 
 for inputFile in `cat ${ntupleType}.list`
 do
@@ -48,7 +50,7 @@ do
 
 cat >> $condorJobCfg <<- _EOF_
 
-arguments      = $inputFile ZBEvtInfo_RunByRunList/${runNum}.list $outputName
+arguments      = $nEvts $inputFile ZBEvtInfo_RunByRunList/${runNum}.list $outputName
 output         = log/${outputName}.out
 error          = log/${outputName}.err
 log            = log/${outputName}.olog
