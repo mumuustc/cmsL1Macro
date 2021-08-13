@@ -74,7 +74,7 @@ TH2D *hZDCMinusVsZDCPlus_Peripheral;
 void bookHistogram();
 void writeHistogram(TString outputFileName);
 
-int produceEff(TString caloTreeList="test.list", TString outputFileName="L1Eff.test.histo")
+int produceHisto(TString caloTreeList="test.list", TString outputFileName="L1Eff.test.histo")
 {
     TH1::SetDefaultSumw2(kTRUE);
 
@@ -124,6 +124,8 @@ int produceEff(TString caloTreeList="test.list", TString outputFileName="L1Eff.t
             cout << "begin " << ievt << "th entry...." << endl;
         }
 
+        event->GetEntry(ievt);
+
         //evtSel[4-15]
         //[4]=0: HFPlusMaxTower < 3 GeV;  [4]=1: HFPlusMaxTower > 3 GeV
         //[5]=0: HFMinusMaxTower < 3 GeV;  [5]=1: HFMinusMaxTower > 3 GeV
@@ -134,7 +136,6 @@ int produceEff(TString caloTreeList="test.list", TString outputFileName="L1Eff.t
         //[14] is for Plus & [15] is for Minus; Threshold = 8 GeV
         //[16] is for Plus (Th = 7.3 GeV) & [17] is for Minus (Th = 7.6 GeV); 
 
-        event->GetEntry(ievt);
         Short_t mCenBin      = event->mCenBin;
         Float_t mZDCPlus     = event->mZDCPlus;
         Float_t mZDCMinus    = event->mZDCMinus;

@@ -53,12 +53,12 @@ dataMap = {
         "run327174": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327174-94cbf4add1123a786b867f646bf0f0da/USER"},
         "run327327": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327327-94cbf4add1123a786b867f646bf0f0da/USER"},
         "run327554": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327554-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run326859": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run326859-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run326942": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run326942-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run327148": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327148-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run327211": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327211-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run327238": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327238-94cbf4add1123a786b867f646bf0f0da/USER"},
-#        "run327488": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327488-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run326859": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run326859-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run326942": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run326942-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run327148": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327148-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run327211": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327211-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run327238": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327238-94cbf4add1123a786b867f646bf0f0da/USER"},
+        "run327488": { "mDataset": "/HIForward/shuaiy-SkimedZeroBias_HIRun2018A_v1_RAW_run327488-94cbf4add1123a786b867f646bf0f0da/USER"},
         }
 
 ## Submit job for different datasets 

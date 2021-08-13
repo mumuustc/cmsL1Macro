@@ -32,7 +32,7 @@ process.hcalDigis.saveQIE10DataNSamples = cms.untracked.vint32(10)
 process.hcalDigis.saveQIE10DataTags = cms.untracked.vstring( "MYDATA" )
 ' >> ${config}.py
 
-# store HF depth, ADC, and energy information (significantly increase the size of l1Ntuple.root)
+# store HF depth, ADC, and energy information
 echo '
 process.HFAdcana = cms.EDAnalyzer("HFAdcToGeV",
     digiLabel = cms.untracked.InputTag("hcalDigis")
