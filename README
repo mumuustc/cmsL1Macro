@@ -37,5 +37,8 @@
    4-5) root -l -b -q checkUPCTrig.C+ to study L1 UPC trigger
 
 
-5) L1 Calorimeter study (check various distributions between noise and collisions)
-   # coming soon
+5) L1 calorimeter performance study (check various L1 ECal and HCal information between noise and collisions)
+   5-1) root -l -b -q 'anaCalo.C+("allData.list", "caloInfo.allData.histo")' to generate histograms of L1 calorimeter information
+        -- To run a quick test: root -l -b -q anaCalo.C+
+   5-2) root -l -b -q 'plotCaloInfo.C+("caloInfo.allData.histo")' to dump L1 calorimeter related plots 
+        -- To process the histograms in caloInfo.test.histo.root: root -l -b -q plotCaloInfo.C+
