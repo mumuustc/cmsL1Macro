@@ -17,11 +17,14 @@ using namespace std;
 #include "TFile.h"
 #include "TTree.h"
 
-#include "L1AnalysisEventDataFormat.h"
-#include "L1AnalysisCaloTPDataFormat.h"
-#include "L1AnalysisL1CaloTowerDataFormat.h"
+#include "interface/L1AnalysisEventDataFormat.h"
+#include "interface/L1AnalysisCaloTPDataFormat.h"
+#include "interface/L1AnalysisL1CaloTowerDataFormat.h"
+#include "interface/L1AnalysisL1UpgradeDataFormat.h"
+#include "interface/L1AnalysisL1UpgradeTfMuonDataFormat.h"
 
-int makeCaloTree(Int_t nEvts = 10, TString L1File="/eos/cms/store/group/phys_heavyions/shuaiy/L1Emulator/L1Ntuple/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/HIForward/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/210505_023909/0000/L1Ntuple_88.root", TString HiForestFileList="ZBEvtInfo_RunByRunList/327211.list", TString outputFile="EvtL1CaloInfo_test")
+//int makeTree(Int_t nEvts = 10, TString L1File="/afs/cern.ch/user/s/shuaiy/work/public/L1Emulator/CMSSW_11_0_2/src/L1Ntuple.root", TString HiForestFileList="ZBEvtInfo_RunByRunList/327211.list", TString outputFile="EvtL1CaloInfo_test")
+int makeTree(Int_t nEvts = 10, TString L1File="/eos/cms/store/group/phys_heavyions/shuaiy/L1Emulator/L1Ntuple/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/HIForward/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/210505_023909/0000/L1Ntuple_88.root", TString HiForestFileList="ZBEvtInfo_RunByRunList/327211.list", TString outputFile="EvtL1CaloInfo_test")
 {
     TFile *fL1Ntuple = TFile::Open(L1File);
     TTree *mL1EventTree = (TTree *)fL1Ntuple->Get("l1EventTree/L1EventTree");
@@ -44,19 +47,61 @@ int makeCaloTree(Int_t nEvts = 10, TString L1File="/eos/cms/store/group/phys_hea
     L1Analysis::L1AnalysisL1CaloTowerDataFormat *l1CaloTowerEmu = new L1Analysis::L1AnalysisL1CaloTowerDataFormat();
     mL1CaloTowerEmuTree->SetBranchAddress("L1CaloTower", &l1CaloTowerEmu);
 
+    //// read out L1 EGamma and muon information
+    //TTree *mL1UpgradeTree = (TTree *)fL1Ntuple->Get("l1UpgradeTree/L1UpgradeTree");
+    //L1Analysis::L1AnalysisL1UpgradeDataFormat *l1Upgrade = new L1Analysis::L1AnalysisL1UpgradeDataFormat();
+    //mL1UpgradeTree->SetBranchAddress("L1Upgrade", &l1Upgrade);
 
-    //for(Int_t i=0; i<25; i++){
-    //    mL1EventTree->GetEntry(i);
-    //    cout<<l1Event->run<<"   "<<l1Event->event<<"   "<<l1Event->lumi<<endl;
-    //}
-    //return -1;
+    //for(Int_t i=0; i<10; i++){
+    //    mL1UpgradeTree->GetEntry(i);
 
-    //for(Int_t i=0; i<20000; i++){
-    //    mL1CaloTowerTree->GetEntry(i);
-    //    if(l1CaloTP->nHCALTP>0)   cout<<l1CaloTP->nHCALTP<<"   "<<l1CaloTP->hcalTPieta.size()<<endl;
-    //    if(l1CaloTower->nTower>0) cout<<l1CaloTower->nTower<<"   "<<l1CaloTower->ieta.size()<<endl;
+    //    cout<<"nEGs: "<<l1Upgrade->nEGs<<endl;
+    //    for(Int_t idx=0; idx<l1Upgrade->nEGs; idx++){
+    //        cout<<l1Upgrade->egEt[idx]<<endl;
+    //        cout<<l1Upgrade->egEta[idx]<<endl;
+    //        cout<<l1Upgrade->egPhi[idx]<<endl;
+    //        //...
+    //    }
+
+    //    cout<<"nMuons: "<<l1Upgrade->nMuons<<endl;
+    //    for(Int_t idx=0; idx<l1Upgrade->nMuons; idx++){
+    //        cout<<l1Upgrade->muonEt[idx]<<endl;
+    //        cout<<l1Upgrade->muonEta[idx]<<endl;
+    //        cout<<l1Upgrade->muonPhi[idx]<<endl;
+    //        //...
+    //    }
+
+    //    cout<<endl;
     //}
-    //return -1;
+
+    //// read out TFMuon information
+    //TTree *mL1UpgradeTfMuonTree = (TTree *)fL1Ntuple->Get("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+    //L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat *l1UpgradeBmtfMuon = new L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat();
+    //mL1UpgradeTfMuonTree->SetBranchAddress("L1UpgradeBmtfMuon", &l1UpgradeBmtfMuon);
+
+    //L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat *l1UpgradeOmtfMuon = new L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat();
+    //mL1UpgradeTfMuonTree->SetBranchAddress("L1UpgradeOmtfMuon", &l1UpgradeOmtfMuon);
+
+    //L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat *l1UpgradeEmtfMuon = new L1Analysis::L1AnalysisL1UpgradeTfMuonDataFormat();
+    //mL1UpgradeTfMuonTree->SetBranchAddress("L1UpgradeEmtfMuon", &l1UpgradeEmtfMuon);
+
+    //for(Int_t i=0; i<10; i++){
+    //    cout<<"nBmtfMuons: "<<l1UpgradeBmtfMuon->nTfMuons<<endl;
+    //    for(Int_t idx=0; idx<l1UpgradeBmtfMuon->nTfMuons; idx++){
+    //        cout<<l1UpgradeBmtfMuon->tfMuonHwPt[idx]<<endl;
+    //        cout<<l1UpgradeBmtfMuon->tfMuonHwEta[idx]<<endl;
+    //        cout<<l1UpgradeBmtfMuon->tfMuonHwPhi[idx]<<endl;
+    //        // ...
+    //    }
+
+    //    cout<<"nOmtfMuons: "<<l1UpgradeOmtfMuon->nTfMuons<<endl;
+    //    // ...
+
+    //    cout<<"nBmtfMuons: "<<l1UpgradeEmtfMuon->nTfMuons<<endl;
+    //    // ...
+    //   
+    //    cout<<endl;
+    //}
 
     std::vector<int> *ieta_HF;
     std::vector<int> *iphi_HF;

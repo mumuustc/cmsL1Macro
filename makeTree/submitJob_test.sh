@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#ntupleType="test"
-ntupleType="L1NtupleRAWEMUCalo_HFAdc"
+ntupleType="test"
+#ntupleType="L1NtupleRAWEMUCalo_HFAdc"
 
 initDir="$PWD/condor_projects/$ntupleType"
 mkdir -p $initDir
@@ -9,7 +9,7 @@ rm -rf $initDir/*
 
 mkdir -p $initDir/log $initDir/output
 
-tar -cvf $initDir/inputTarball.tar makeCaloTree.C *.h ZBEvtInfo_RunByRunList
+tar -cvf $initDir/inputTarball.tar makeTree.C interface ZBEvtInfo_RunByRunList
 
 condorJobCfg="$initDir/condorJob_${ntupleType}.con"
 
@@ -17,12 +17,12 @@ cat > $condorJobCfg <<- _EOF_
 Universe     = vanilla
 GetEnv       = False
 InitialDir   = $initDir
-+JobFlavour  = "testmatch"
++JobFlavour  = "microcentury"
 Requirements = (OpSysAndVer =?= "CentOS7")
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 transfer_input_files = inputTarball.tar
-Executable = makeCaloTree.sh
+Executable = makeTree.sh
 _EOF_
 
 #+JobFlavour  = "espresso"      # 20 mins
@@ -31,7 +31,7 @@ _EOF_
 #+JobFlavour  = "tomorrow"      # 1 day
 #+JobFlavour  = "testmatch"     # 3 days
 
-nEvts=-1;
+nEvts=200;
 
 for inputFile in `cat ${ntupleType}.list`
 do

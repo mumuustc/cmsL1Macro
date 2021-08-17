@@ -21,8 +21,8 @@
 
 
 3) Combine L1 (HF, calorimeter, etc.) and offline information into plain root tree
-   3-1) cd cmsL1Macro/makeCaloTree
-   3-2) root -l -b -q makeCaloTree.C+ to do local test
+   3-1) cd cmsL1Macro/makeTree
+   3-2) root -l -b -q makeTree.C+ to do local test
    3-3) ./submitJob.sh to submit condor job (for test purpose, please excute './submitJob_test.sh')
 
 

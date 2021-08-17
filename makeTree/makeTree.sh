@@ -14,7 +14,7 @@ tar -xvf inputTarball.tar
 
 root -b <<EOF
 .O2
-.L makeCaloTree.C+
-makeCaloTree($nEvts, "$L1File", "$HiForestList", "$outputName")
+.L makeTree.C+
+makeTree($nEvts, "$L1File", "$HiForestList", "$outputName")
 .q
 EOF

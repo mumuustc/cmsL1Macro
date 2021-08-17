@@ -10,7 +10,7 @@ filein='file:/eos/cms/store/group/phys_heavyions/shuaiy/L1Emulator/HIForwardRAW/
 cmsDriver.py l1Ntuple -s RAW2DIGI --no_exec --repacked \
     --python_filename=${config}.py -n 1000 --no_output --era=${era} --data --conditions=${globaltag} \
     --customise=L1Trigger/Configuration/customiseReEmul.L1TReEmulFromRAW \
-    --customise=L1Trigger/L1TNtuples/customiseL1Ntuple.L1NtupleRAWEMUCalo \
+    --customise=L1Trigger/L1TNtuples/customiseL1Ntuple.L1NtupleRAWEMU \
     --customise=L1Trigger/Configuration/customiseSettings.L1TSettingsToCaloParams_2018_v1_4_1 \
     --filein=${filein}
 #    --customise=L1Trigger/L1TNtuples/customiseL1Ntuple.L1NtupleRAW \
