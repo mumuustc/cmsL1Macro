@@ -1,49 +1,37 @@
-#include "/afs/cern.ch/user/s/shuaiy/Tools/Macro/headers.h"
-#include "/afs/cern.ch/user/s/shuaiy/Tools/Macro/function.C"
+#include <stdio.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <map>
+#include <vector>
+#include <string>
+#include <utility>
+#include "math.h"
+#include "sys/types.h"
 
+using namespace std;
+
+#include "TChain.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TH3.h"
+
+#include "hfConstant.h"
 #include "L1AnalysisEventDataFormat.h"
-#include "L1AnalysisCaloTPDataFormat.h"
 
-int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2018_HIZeroBias_run326630_L1NtupleRAWEMU/HIZeroBiasReducedFormat/PbPb2018_HIZeroBias_run326630_L1NtupleRAWEMU/200406_171316/0000/L1Ntuple_1.root", TString HiForestFileList="ZB_HiForest_RunByRunList/326630.list", TString outputFile="test")
+int anaNoise(Int_t nEvts = 10, TString L1File="/eos/cms/store/group/phys_heavyions/shuaiy/L1Emulator/L1Ntuple/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/HIForward/L1NtupleRAWEMUCalo_HFAdc_ZeroBias_run327211/210505_023909/0000/L1Ntuple_88.root", TString HiForestFileList="ZBEvtInfo_RunByRunList/327211.list", TString outputFile="L1HFHisto_test")
 {
-    TChain *mHiForestEvtChain  = new TChain("hiEvtAnalyzer/HiTree");
-    TChain *mHiForestSkimChain = new TChain("skimanalysis/HltTree");
-
-    Int_t ifile=0;
-    char filename[512];
-    ifstream *inputStream = new ifstream;
-    inputStream->open(HiForestFileList.Data());
-    if (!(inputStream)) {
-        printf("can not open list file\n");
-        return 0;
-    }
-    for(;inputStream->good();){
-        inputStream->getline(filename,512);
-        if(inputStream->good()) {
-            TFile *ftmp = new TFile(filename);
-            if(!ftmp||!(ftmp->IsOpen())||!(ftmp->GetNkeys())) {
-                cout<<"something wrong"<<endl;
-            } else {
-                cout<<"read in "<<ifile<<"th file: "<<filename<<endl;
-                mHiForestEvtChain->Add(filename);
-                mHiForestSkimChain->Add(filename);
-                ifile++;
-            }
-            delete ftmp;
-        }
-    }
-    delete inputStream;
-
     TFile *fL1Ntuple = TFile::Open(L1File);
     TTree *mL1EventTree = (TTree *)fL1Ntuple->Get("l1EventTree/L1EventTree");
-    TTree *mL1CaloTowerTree = (TTree *)fL1Ntuple->Get("l1CaloTowerTree/L1CaloTowerTree");
     TTree *mAdcTree = (TTree *)fL1Ntuple->Get("HFAdcana/adc");
 
+    // grab L1 event information
     L1Analysis::L1AnalysisEventDataFormat *l1Event = new L1Analysis::L1AnalysisEventDataFormat();
     mL1EventTree->SetBranchAddress("Event", &l1Event);
-
-    L1Analysis::L1AnalysisCaloTPDataFormat *l1CaloTP = new L1Analysis::L1AnalysisCaloTPDataFormat();
-    mL1CaloTowerTree->SetBranchAddress("CaloTP", &l1CaloTP);
 
     //for(Int_t i=0; i<25; i++){
     //    mL1EventTree->GetEntry(i);
@@ -51,18 +39,13 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
     //}
     //return -1;
 
-    //for(Int_t i=0; i<20000; i++){
-    //    mL1CaloTowerTree->GetEntry(i);
-    //    cout<<l1CaloTP->nHCALTP<<"   "<<l1CaloTP->hcalTPieta.size()<<endl;
-    //}
-    //return -1;
-
+    // grab L1 HF information
     std::vector<int> *ieta;
     std::vector<int> *iphi;
     std::vector<int> *depth;
     std::vector<int> *ampl;
-    std::vector<double> *energy_ped;
-    std::vector<double> *energy;
+    std::vector<float> *energy_ped;
+    std::vector<float> *energy;
 
     ieta = 0;
     iphi = 0;
@@ -93,64 +76,78 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
     //}
     //return -1;
 
-    unsigned long long hiForestEvt = 0;
-    unsigned int hiForestRun = 0;
-    unsigned int hiForestLumi = 0;
-    int hiForestCenBin = -1;
+    // grab offline information
+    TChain *mHiEvtChain  = new TChain("eventinfoana/EventInfoNtuple");
 
-    int pclusterCompatibilityFilter = 0;
-    int pprimaryVertexFilter = 0;
-    int phfCoincFilter3Th3 = 0;
-    int phfCoincFilter2Th4 = 0;
-    int collisionEventSelectionAOD = 0;
-    int collisionEventSelectionAODv2 = 0;
+    Int_t ifile=0;
+    char filename[512];
+    ifstream *inputStream = new ifstream;
+    inputStream->open(HiForestFileList.Data());
+    if (!(inputStream)) {
+        printf("can not open list file\n");
+        return 0;
+    }
+    for(;inputStream->good();){
+        inputStream->getline(filename,512);
+        if(inputStream->good()) {
+            TFile *ftmp = new TFile(filename);
+            if(!ftmp||!(ftmp->IsOpen())||!(ftmp->GetNkeys())) {
+                cout<<"something wrong"<<endl;
+            } else {
+                cout<<"read in "<<ifile<<"th file: "<<filename<<endl;
+                mHiEvtChain->Add(filename);
+                ifile++;
+            }
+            delete ftmp;
+        }
+    }
+    delete inputStream;
 
-    mHiForestEvtChain->SetBranchStatus("*", 0);
-    mHiForestEvtChain->SetBranchStatus("run", 1);
-    mHiForestEvtChain->SetBranchStatus("evt", 1);
-    mHiForestEvtChain->SetBranchStatus("lumi", 1);
-    mHiForestEvtChain->SetBranchStatus("hiBin", 1);
-    mHiForestEvtChain->SetBranchAddress("run", &hiForestRun);
-    mHiForestEvtChain->SetBranchAddress("evt", &hiForestEvt);
-    mHiForestEvtChain->SetBranchAddress("lumi", &hiForestLumi);
-    mHiForestEvtChain->SetBranchAddress("hiBin", &hiForestCenBin);
+    const int nMaxEvtSelBits = 18;
+    const int nMaxTrigHLTBits = 12;
 
-    mHiForestSkimChain->SetBranchStatus("*", 0);
-    mHiForestSkimChain->SetBranchStatus("pclusterCompatibilityFilter", 1);
-    mHiForestSkimChain->SetBranchStatus("pprimaryVertexFilter", 1);
-    mHiForestSkimChain->SetBranchStatus("phfCoincFilter3Th3", 1);
-    mHiForestSkimChain->SetBranchStatus("phfCoincFilter2Th4", 1);
-    mHiForestSkimChain->SetBranchStatus("collisionEventSelectionAOD", 1);
-    mHiForestSkimChain->SetBranchStatus("collisionEventSelectionAODv2", 1);
-    mHiForestSkimChain->SetBranchAddress("pclusterCompatibilityFilter", &pclusterCompatibilityFilter);
-    mHiForestSkimChain->SetBranchAddress("pprimaryVertexFilter", &pprimaryVertexFilter);
-    mHiForestSkimChain->SetBranchAddress("phfCoincFilter3Th3", &phfCoincFilter3Th3);
-    mHiForestSkimChain->SetBranchAddress("phfCoincFilter2Th4", &phfCoincFilter2Th4);
-    mHiForestSkimChain->SetBranchAddress("collisionEventSelectionAOD", &collisionEventSelectionAOD);
-    mHiForestSkimChain->SetBranchAddress("collisionEventSelectionAODv2", &collisionEventSelectionAODv2);
+    unsigned int RunNb = 0;
+    unsigned int LSNb = 0;
+    unsigned int EventNb = 0;
+    short        centrality = -1;
+    float        bestvtxX, bestvtxY, bestvtxZ;
+    float        ZDCPlus, ZDCMinus;
+    int          Npixel, Ntrkoffline, NtrkHP;
+    Bool_t       trigHLT[nMaxTrigHLTBits];
+    Bool_t       evtSel[nMaxEvtSelBits];
 
-    //for(Int_t i=0; i<25; i++){
-    //    mHiForestEvtChain->GetEntry(i);
-    //    mHiForestSkimChain->GetEntry(i);
-    //    cout<<hiForestRun<<"   "<<hiForestEvt<<"   "<<hiForestLumi<<endl;
-    //    if(collisionEventSelectionAODv2){
-    //        cout<<pclusterCompatibilityFilter<<"   "<<phfCoincFilter2Th4<<"   "<<collisionEventSelectionAODv2<<endl;
-    //    }
-    //}
+    mHiEvtChain->SetBranchStatus("*", 0);
+    mHiEvtChain->SetBranchStatus("RunNb", 1);
+    mHiEvtChain->SetBranchStatus("LSNb", 1);
+    mHiEvtChain->SetBranchStatus("EventNb", 1);
+    mHiEvtChain->SetBranchStatus("centrality", 1);
+    mHiEvtChain->SetBranchStatus("bestvtxX", 1);
+    mHiEvtChain->SetBranchStatus("bestvtxY", 1);
+    mHiEvtChain->SetBranchStatus("bestvtxZ", 1);
+    mHiEvtChain->SetBranchStatus("Npixel", 1);
+    mHiEvtChain->SetBranchStatus("ZDCPlus", 1);
+    mHiEvtChain->SetBranchStatus("ZDCMinus", 1);
+    mHiEvtChain->SetBranchStatus("Ntrkoffline", 1);
+    mHiEvtChain->SetBranchStatus("NtrkHP", 1);
+    mHiEvtChain->SetBranchStatus("trigHLT", 1);
+    mHiEvtChain->SetBranchStatus("evtSel", 1);
 
-    //return -1;
+    mHiEvtChain->SetBranchAddress("RunNb", &RunNb);
+    mHiEvtChain->SetBranchAddress("LSNb", &LSNb);
+    mHiEvtChain->SetBranchAddress("EventNb", &EventNb);
+    mHiEvtChain->SetBranchAddress("centrality", &centrality);
+    mHiEvtChain->SetBranchAddress("bestvtxX", &bestvtxX);
+    mHiEvtChain->SetBranchAddress("bestvtxY", &bestvtxY);
+    mHiEvtChain->SetBranchAddress("bestvtxZ", &bestvtxZ);
+    mHiEvtChain->SetBranchAddress("ZDCPlus", &ZDCPlus);
+    mHiEvtChain->SetBranchAddress("ZDCMinus", &ZDCMinus);
+    mHiEvtChain->SetBranchAddress("Npixel", &Npixel);
+    mHiEvtChain->SetBranchAddress("Ntrkoffline", &Ntrkoffline);
+    mHiEvtChain->SetBranchAddress("NtrkHP", &NtrkHP);
+    mHiEvtChain->SetBranchAddress("trigHLT", trigHLT);
+    mHiEvtChain->SetBranchAddress("evtSel", evtSel);
 
-    const int nMaxEta = 26, nMaxPhi = 36, nMaxDepth = 4, nMaxFiber=2;
-
-    int    adc[nMaxEta][nMaxPhi][nMaxDepth];
-    double e_ped[nMaxEta][nMaxPhi][nMaxDepth];
-    double e[nMaxEta][nMaxPhi][nMaxDepth];
-    bool   trigTower[nMaxEta][nMaxPhi];
-
-    int    fiberAdc[nMaxEta][nMaxPhi][nMaxFiber];
-    double fiberE_ped[nMaxEta][nMaxPhi][nMaxFiber];
-
-    const int    nMaxTowers = nMaxEta*nMaxPhi;
+    // define histograms
     const int    nAdcBins = 200;
     const int    nEBins   = 500;
     const double minE     = 0;
@@ -191,7 +188,6 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
     TH1D *hEpedDep3Dep1Diff_Collision = new TH1D("hEpedDep3Dep1Diff_Collision", "hEpedDep3Dep1Diff_Collision; energy w/pedestal (depth3 - depth1)", 2*nEBins, -maxE, maxE);
     TH1D *hEpedDep4Dep2Diff_Collision = new TH1D("hEpedDep4Dep2Diff_Collision", "hEpedDep4Dep2Diff_Collision; energy w/pedestal (depth4 - depth2)", 2*nEBins, -maxE, maxE);
 
-    TString fiberName[nMaxFiber] = {"long fiber", "short fiber"};
     TH2D *hFiberAdcvsTower_Noise[nMaxFiber];
     TH2D *hFiberEpedvsTower_Noise[nMaxFiber];
     TH2D *hFiberAdcvsTower_Collision[nMaxFiber];
@@ -219,37 +215,54 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
     TH2D *hTrigAdcLongShortDiffvsCen_Collision  = new TH2D("hTrigAdcLongShortDiffvsCen_Collision", "hTrigAdcLongShortDiffvsCen_Collision; centrality; adc (long fiber - short fiber)", 20, 0, 200, 2*nAdcBins, -nAdcBins, nAdcBins);
     TH2D *hTrigEpedLongShortDiffvsCen_Collision = new TH2D("hTrigEpedLongShortDiffvsCen_Collision", "hTrigEpedLongShortDiffvsCen_Collision; centrality; energy w/pedestal (long fiber - short fiber)", 20, 0, 200, 2*nEBins, -maxE, maxE);
 
-    Int_t ncount=0;
+    // L1 & offline information match
+    int    adc[nMaxEta][nMaxPhi][nMaxDepth];
+    double e_ped[nMaxEta][nMaxPhi][nMaxDepth];
+    double e[nMaxEta][nMaxPhi][nMaxDepth];
+    bool   trigTower[nMaxEta][nMaxPhi];
 
-    int nEvts = 100000;
-    //int nEvts = mAdcTree->GetEntries();
+    int    fiberAdc[nMaxEta][nMaxPhi][nMaxFiber];
+    double fiberE_ped[nMaxEta][nMaxPhi][nMaxFiber];
+
+    int    nCollisions=0;
+
+    if(nEvts<0){
+        nEvts = mL1EventTree->GetEntries();
+    }
     cout<<"Total Entries: "<<nEvts<<endl;
     for(int ievt=0; ievt<nEvts; ievt++){
-        //if(nEvts<100){
-        //    cout << "begin " << ievt << "th entry...." << endl;
-        //}
-        //else if(ievt % (nEvts / 100) == 0){
-        //    cout << "begin " << ievt << "th entry...." << endl;
-        //}
-        if(ievt%100 == 0) cout << "begin " << ievt << "th entry...." << endl;
+        if(nEvts<100){
+            cout << "begin " << ievt << "th entry...." << endl;
+        }
+        else if(ievt % (nEvts / 100) == 0){
+            cout << "begin " << ievt << "th entry...." << endl;
+        }
+        //if(ievt%100 == 0) cout << "begin " << ievt << "th entry...." << endl;
 
         mL1EventTree->GetEntry(ievt);
-        mL1CaloTowerTree->GetEntry(ievt);
         mAdcTree->GetEntry(ievt);
 
         Bool_t isNoise = kFALSE;
         Bool_t isCollision = kFALSE;
         Bool_t evtMatch = kFALSE;
         Int_t  cenBin = -1;
-        for(Int_t jevt=0; jevt<mHiForestEvtChain->GetEntries(); jevt++){
-            mHiForestEvtChain->GetEntry(jevt);
-            mHiForestSkimChain->GetEntry(jevt);
+        for(Int_t jevt=0; jevt<mHiEvtChain->GetEntries(); jevt++){
+            mHiEvtChain->GetEntry(jevt);
 
-            if(l1Event->run == hiForestRun && l1Event->event == hiForestEvt && l1Event->lumi == hiForestLumi){
+            Bool_t  colEvtSel                  = evtSel[0];
+            Bool_t  hfCoincFilter2Th4          = evtSel[1];
+            Bool_t  primaryVertexFilter        = evtSel[2];
+            Bool_t  clusterCompatibilityFilter = evtSel[3];
+            Bool_t  hfPosFilterTh5             = evtSel[8];
+            Bool_t  hfNegFilterTh5             = evtSel[9];
+            Bool_t  hfPosFilterTh7             = evtSel[12];
+            Bool_t  hfNegFilterTh7             = evtSel[13];
+
+            if(l1Event->run == RunNb && l1Event->event == EventNb && l1Event->lumi == LSNb){
                 //isNoise = !(pprimaryVertexFilter || phfCoincFilter2Th4); 
-                isNoise = !pprimaryVertexFilter; 
-                isCollision = collisionEventSelectionAODv2;
-                cenBin = hiForestCenBin;
+                isNoise     = !colEvtSel; 
+                isCollision = colEvtSel;
+                cenBin      = centrality;
 
                 evtMatch = kTRUE;
 
@@ -258,23 +271,12 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
         }
 
         if(!evtMatch){
-            cout<<"Cannot find HiForest event matched with L1 event: "<<endl;
+            cout<<"Cannot find offline event matched with L1 event: "<<endl;
             cout<<"runId: "<<l1Event->run<<"     eventId: "<<l1Event->event<<"     lumiId: "<<l1Event->lumi<<endl;
 
             continue;
         }
-        if(isCollision) ncount++;
-
-        for(int idx=0; idx<l1CaloTP->nHCALTP; idx++){
-            int etaIdx   = l1CaloTP->hcalTPieta[idx]>0 ? l1CaloTP->hcalTPieta[idx]-16 : l1CaloTP->hcalTPieta[idx]+41;
-            int phiIdx   = l1CaloTP->hcalTPiphi[idx]/2;
-            //cout<<etaIdx<<"   "<<phiIdx<<endl;
-            
-            int towerIdx = etaIdx*nMaxPhi + phiIdx;
-
-            if(isNoise)     hHCalTPCompEtvsTower_Noise->Fill(towerIdx, l1CaloTP->hcalTPcompEt[idx]);
-            if(isCollision) hHCalTPCompEtvsTower_Collision->Fill(towerIdx, l1CaloTP->hcalTPcompEt[idx]);
-        }
+        if(isCollision) nCollisions++;
 
         memset(adc, -1, sizeof(adc));
         memset(e, -1, sizeof(e));
@@ -381,7 +383,7 @@ int anaNoise(TString L1File="/afs/cern.ch/user/s/shuaiy/eos_hin/L1Emulator/PbPb2
         }
     }
 
-    cout<<"Total number of collision events: "<<ncount<<endl;
+    cout<<"Total number of collision events: "<<nCollisions<<endl;
 
     TFile *fOut = new TFile(Form("%s.root", outputFile.Data()), "recreate");
     fOut->cd();

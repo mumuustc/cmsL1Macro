@@ -42,3 +42,12 @@
         -- To run a quick test: root -l -b -q anaCalo.C+
    5-2) root -l -b -q 'plotCaloInfo.C+("caloInfo.allData.histo")' to dump L1 calorimeter related plots 
         -- To process the histograms in caloInfo.test.histo.root: root -l -b -q plotCaloInfo.C+
+
+
+6) L1 HF noise study
+   -- anaNoise.C generates needed L1 HF related histograms by combining L1 infomation and offline event infomation
+   -- One can also store the detailed L1 HF information (currently only maximum L1 HF ADCs are stored) in the plain root generated in step 3-3), then the time-consuming L1 and offline matching stuff is not needed to be done over and over again
+   6-1) cd cmsL1Macro/HFNoiseStudy
+   6-2) root -l -b -q anaNoise.C+ to do local test. The histograms of L1 HF information are generated in this macro. 
+   6-3) ./submitJob.sh to submit condor job (for test purpose, please excute './submitJob_test.sh')
+   6-4) root -l -b -q plotNoise.C+ to dump L1 HF related plots (please feed the generated root file from step 6-3) to this macro)

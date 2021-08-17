@@ -1,14 +1,3 @@
-//const int nMaxEta = 26;
-//const int nMaxPhi = 36;
-//const int nMaxDepth = 4;
-//const int nMaxFiber=2;
-//const TString fiberName[nMaxFiber] = {"long fiber", "short fiber"};
-//
-//const int nMaxTowers = nMaxEta*nMaxPhi;
-//
-//const int HFPlusAdcTh = 15; // 19
-//const int HFMinusAdcTh = 15; // 19
-
 const Int_t nDirs = 2; // 0 - Plus; 1 - Minus;
 const TString  mDir[nDirs] = {"Plus", "Minus"};
 
